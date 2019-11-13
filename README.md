@@ -12,7 +12,7 @@ Copy the binary to `~/.local/bin/autoplank`:
 cp target/release/autoplank ~/.local/bin/autoplank
 ```
 
-Create a autostart file: `~/.config/autostart/autoplank`
+Create a autostart file: `~/.config/autostart/autoplank.desktop`
 ```
 [Desktop Entry]
 Type=Application
