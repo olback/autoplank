@@ -22,7 +22,7 @@ impl Plank {
 
         if current.to_string().trim() != new {
 
-            println!("Switching to {}", new);
+            println!("=> Switching to {}", new);
 
             let output = Command::new("dconf").args(&["write", DCONF_KEY, &new]).output().unwrap();
             let status = output.status.success();

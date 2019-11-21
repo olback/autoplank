@@ -1,6 +1,11 @@
 use std::process::Command;
 
-const DEPENDENCIES: &'static [&'static str] = &["plank", "xrandr", "xdotool", "dconf"];
+const DEPENDENCIES: &'static [&'static str] = &[
+    "plank",
+    "xrandr",
+    "xdotool",
+    "dconf"
+];
 
 pub fn check() -> (bool, Vec<&'static str>) {
 

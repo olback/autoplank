@@ -1,0 +1,11 @@
+name: "Autoplank"
+# version: "0.1.0"
+author: "olback <autoplank@olback.net>"
+about: "Autoplank. Automatically move plank across monitors!"
+args:
+    - rescan:
+        help: "Rescan monitors. This is needed when you add/remove a monitor."
+        short: r
+        long: rescan
+        takes_value: false
+        multiple: false

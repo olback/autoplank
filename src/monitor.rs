@@ -1,5 +1,5 @@
 use std::process::Command;
-use super::MouseLocation;
+use super::mouse_location::MouseLocation;
 
 #[derive(Debug)]
 pub struct Offset {

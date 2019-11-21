@@ -21,4 +21,9 @@ Description=Move plank to the monitor your mouse is at.
 Exec=.local/bin/autoplank
 ```
 
+When adding/removing a monitor make sure to rescan:
+```terminal
+autoplank -r
+```
+
 Inspired by [abiosoft/autoplank](https://github.com/abiosoft/autoplank).
