@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cricleci/rust:latest
+      - image: circleci/rust:latest
 
     steps:
       - checkout
