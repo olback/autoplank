@@ -2,7 +2,7 @@
 
 Automatically move plank to the monitor your mouse cursor is currently on.
 
-Build the program:
+Build the program or download the latest version from [releases](https://github.com/olback/autoplank/releases).
 ```
 cargo build --release
 ```

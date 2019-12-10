@@ -40,8 +40,13 @@ impl Plank {
     }
 
     pub fn restart(&mut self) {
-        &self.child.kill();
+        self.kill();
         self.child = Self::spawn();
+    }
+
+    fn kill(&mut self) {
+        self.child.kill().unwrap();
+        self.child.wait().unwrap(); // prevent zombie processes
     }
 
     fn spawn() -> Child {
@@ -49,6 +54,14 @@ impl Plank {
         .stdout(Stdio::piped())
         .spawn()
         .unwrap();
+    }
+
+}
+
+impl Drop for Plank {
+
+    fn drop(&mut self) {
+        self.kill();
     }
 
 }
