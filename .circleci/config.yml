@@ -1,0 +1,106 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: circleci/rust:latest
+
+    steps:
+      - checkout
+
+      - run:
+          name: Change Permissions for Cargo Cache
+          command: |
+                    if [ -d "/usr/local/cargo" ]; then
+                      sudo chown -R circleci:circleci /usr/local/cargo
+                    fi
+
+      - restore_cache:
+          name: Restore Linux Rust Cache
+          key: cargo-cache-v1-{{ checksum "Cargo.lock" }}-{{ checksum "Cargo.toml" }}
+
+      - run:
+          name: Use Stable as Default
+          command: rustup default stable
+
+      - run:
+          name: Show Version
+          command: |
+                    rustc --version --verbose
+                    rustup --version
+                    cargo --version --verbose
+
+      - run:
+          name: Build Binary
+          command: cargo build --release --target=x86_64-unknown-linux-gnu
+
+      - save_cache:
+          name: Save Linux Rust Cache
+          key: cargo-cache-v1-{{ checksum "Cargo.lock" }}-{{ checksum "Cargo.toml" }}
+          paths:
+            - "~/.cargo/"
+            - "~/.rustup/"
+            - "./target/"
+            - "/usr/local/cargo"
+
+      - run:
+          name: "Generate hash file"
+          command: "cd target/x86_64-unknown-linux-gnu/release && sha256sum autoplank > autoplank.sha256"
+
+      - run:
+          name: "Verify hash"
+          command: "cd target/x86_64-unknown-linux-gnu/release && sha256sum -c autoplank.sha256"
+
+      - run:
+          name: "Show hash"
+          command: "cd target/x86_64-unknown-linux-gnu/release && cat autoplank.sha256"
+
+      - save_cache:
+          name: Save Linux Build Cache
+          key: autoplank-dist-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - "./target/x86_64-unknown-linux-gnu/release/autoplank"
+            - "./target/x86_64-unknown-linux-gnu/release/autoplank.sha256"
+
+
+  deploy:
+    docker:
+      - image: circleci/node:latest
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          name: Restore Deploy Node Cache
+          key: deploy-cache-{{ checksum ".circleci/deploy/package.json" }}-{{ checksum ".circleci/deploy/package-lock.json" }}
+
+      - run:
+          name: Install dependencies
+          command: cd .circleci/deploy && npm install
+
+      - save_cache:
+          name: Save Node Cache
+          key: deploy-cache-{{ checksum ".circleci/deploy/package.json" }}-{{ checksum ".circleci/deploy/package-lock.json" }}
+          paths:
+            - "./.circleci/deploy/node_modules"
+
+      - restore_cache:
+          name: Restore Build
+          key: autoplank-dist-{{ .Environment.CIRCLE_SHA1 }}
+
+      - run:
+          name: Deploy
+          command: node .circleci/deploy/deploy.js
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
