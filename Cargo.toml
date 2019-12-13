@@ -1,6 +1,6 @@
 [package]
 name = "autoplank"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Edwin Svensson <git@olback.net>"]
 edition = "2018"
 
@@ -10,3 +10,4 @@ edition = "2018"
 serde = { version = "1.0", features = ["derive"] }
 bincode = "1.2"
 clap = { version = "2", features = ["yaml"] }
+regex = "1.3"

@@ -11,6 +11,9 @@ pub fn autoplank(m: Arc<Mutex<Vec<Monitor>>>) {
 
     loop {
 
+        // Sleep before locking the mutex to minimize the lock-time.
+        std::thread::sleep(std::time::Duration::from_millis(500));
+
         let ml = MouseLocation::get();
         let monitors = &*m.lock().unwrap();
 
@@ -26,8 +29,6 @@ pub fn autoplank(m: Arc<Mutex<Vec<Monitor>>>) {
             }
 
         }
-
-        std::thread::sleep(std::time::Duration::from_millis(500));
 
     }
 
