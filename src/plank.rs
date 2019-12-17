@@ -1,4 +1,5 @@
 use std::process::{Command, Child, Stdio};
+use sysinfo::{ProcessExt, SystemExt};
 
 const DCONF_KEY: &str = "/net/launchpad/plank/docks/dock1/monitor";
 
@@ -54,6 +55,21 @@ impl Plank {
         .stdout(Stdio::piped())
         .spawn()
         .unwrap();
+    }
+
+    pub fn get_pid() -> Option<i32> {
+
+        let mut system = sysinfo::System::new();
+        system.refresh_all();
+
+        for (pid, process) in system.get_process_list() {
+            if process.name() == "plank" {
+                return Some(*pid)
+            }
+        }
+
+        None
+
     }
 
 }

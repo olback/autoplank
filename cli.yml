@@ -9,3 +9,19 @@ args:
         long: rescan
         takes_value: false
         multiple: false
+    - elementary-fix:
+        help: "Remove plank from cerbere"
+        long: elementary-fix
+        takes_value: false
+        multiple: false
+    - elementary-restore:
+        help: "Add plank from cerbere"
+        long: elementary-restore
+        takes_value: false
+        multiple: false
+    - polling-rate:
+        help: "Set the mouse position polling rate in milliseconds"
+        short: p
+        long: polling-rate
+        takes_value: true
+        multiple: false

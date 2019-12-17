@@ -3,24 +3,17 @@ mod monitor;
 mod plank;
 mod dependencies;
 mod threads;
+mod cerbere;
+mod actions;
 
 use monitor::Monitor;
-use threads::{
-    SOCKET_ADDR,
-    SocketAction,
-    SocketMessage
-};
 use std::{
-    net::Shutdown,
-    os::unix::net::UnixStream,
-    io::Write,
     sync::{
         Arc,
         Mutex
     }
 };
 use clap::{self, load_yaml, crate_version};
-use bincode;
 
 fn main() {
 
@@ -28,31 +21,23 @@ fn main() {
     let matches = clap::App::from(yml).version(crate_version!()).get_matches();
 
     if matches.is_present("rescan") {
-
-        let mut socket = match UnixStream::connect(SOCKET_ADDR) {
-            Ok(s) => s,
-            Err(e) => {
-                eprintln!("{}", e);
-                return;
-            }
-        };
-        let msg = SocketMessage {
-            action: SocketAction::RefreshMonitors
-        };
-        let data = bincode::serialize::<SocketMessage>(&msg).unwrap();
-        socket.write(&data).unwrap();
-        socket.shutdown(Shutdown::Both).unwrap();
-
-        println!("Rescanning started");
-
-        std::process::exit(0);
-
+        actions::rescan();
+    } else if matches.is_present("elementary-fix") {
+        actions::elementary::fix()
+    } else if matches.is_present("elementary-restore") {
+        actions::elementary::restore();
     }
 
+    let polling_rate = match matches.value_of("polling-rate") {
+        Some(v) => v.parse::<u64>().expect("Error parsing polling rate"),
+        None => 500
+    };
+
     println!("Autoplank");
+    println!("=> Polling rate set to {}ms", polling_rate);
 
     // Make sure all dependencies are installed
-    let deps = dependencies::check();
+    let deps = dependencies::startup_check();
     if !deps.0 {
         eprintln!("Missing dependencies:");
         for dep in deps.1 {
@@ -67,13 +52,13 @@ fn main() {
 
     // Autoplank thread, fetches mouse location every 500ms
     let autoplank_monitors = Arc::clone(&monitors);
-    thread_handlers.push(std::thread::spawn(|| {
-        threads::autoplank(autoplank_monitors);
+    thread_handlers.push(std::thread::spawn(move || {
+        threads::autoplank(autoplank_monitors, polling_rate);
     }));
 
     // Socket thread
     let socket_monitors = Arc::clone(&monitors);
-    thread_handlers.push(std::thread::spawn(|| {
+    thread_handlers.push(std::thread::spawn(move || {
         threads::socket(socket_monitors);
     }));
 
