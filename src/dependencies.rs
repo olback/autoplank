@@ -7,17 +7,23 @@ const DEPENDENCIES: &'static [&'static str] = &[
     "dconf"
 ];
 
-pub fn check() -> (bool, Vec<&'static str>) {
+pub fn startup_check() -> (bool, Vec<&'static str>) {
 
     let mut missing = Vec::<&'static str>::new();
 
     for dep in DEPENDENCIES {
-        let output = Command::new("which").arg(dep).output().unwrap();
-        if !output.status.success() {
+        if !check(dep) {
             missing.push(dep);
         }
     }
 
     (missing.len() == 0, missing)
+
+}
+
+pub fn check(dep: &str) -> bool {
+
+    let output = Command::new("which").arg(dep).output().unwrap();
+    output.status.success()
 
 }

@@ -1,4 +1,9 @@
-# 0.1.2
+# 0.1.3
+* Ability to configure cerbere.
+* Kill existing plank process on startup
+* Set polling rate with `-p`
+
+## 0.1.2
 * Improved compatibility with docks and disabled monitors.
 
 ## 0.1.1
