@@ -1,5 +1,7 @@
 # Autoplank
 
+[![CircleCI](https://circleci.com/gh/olback/autoplank/tree/master.svg?style=svg)](https://circleci.com/gh/olback/autoplank/tree/master)
+
 Automatically move plank to the monitor your mouse cursor is currently on.
 
 Build the program or download the latest version from [releases](https://github.com/olback/autoplank/releases). If you download a pre-built binary, don't forget to make it executable!
