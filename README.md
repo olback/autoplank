@@ -33,6 +33,6 @@ autoplank -r
 ```
 
 #### Elementary OS  
-Elementary has a service called `cerbere` which handles wingpanel and plank. To make autoplank work properly, you might have to run `autoplank --elementary-fix`. You can revert this change with `autoplank --elementary-restore`
+Elementary has a service called `cerbere` which handles wingpanel and plank. To make autoplank work properly, you might have to run `autoplank --elementary-fix`. You can revert this change with `autoplank --elementary-restore`. For these commands to take affect, you have to restart/log out and in.
 
 Inspired by [abiosoft/autoplank](https://github.com/abiosoft/autoplank).
