@@ -2,12 +2,16 @@ use super::super::{
     monitor::Monitor
 };
 use std::{
+    time,
+    thread,
     os::unix::net::{
         UnixListener
     },
     io::{
+        self,
         Read,
-        BufReader
+        BufReader,
+        Write
     },
     sync::{
         Arc,
@@ -22,60 +26,60 @@ use bincode;
 pub const SOCKET_ADDR: &str = "/tmp/autoplank.sock";
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct SocketMessage {
-    pub action: SocketAction
+pub enum SocketMessage {
+    Ok(Vec<Monitor>),
+    Err(String),
+    RefreshMonitors
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub enum SocketAction {
-    RefreshMonitors = 1
-}
-
-pub fn socket(m: Arc<Mutex<Vec<Monitor>>>) {
+pub fn socket(m: Arc<Mutex<Vec<Monitor>>>) -> Result<(), io::Error> {
 
     if Path::new(SOCKET_ADDR).exists() {
-        fs::remove_file(SOCKET_ADDR).unwrap();
+        fs::remove_file(SOCKET_ADDR)?;
     }
-    let listener = UnixListener::bind(SOCKET_ADDR).unwrap();
+
+    let listener = UnixListener::bind(SOCKET_ADDR)?;
 
     for stream in listener.incoming() {
 
-        match stream {
+        let mut s = stream?;
 
-            Ok(stream) => {
+        thread::sleep(time::Duration::from_millis(10));
 
-                std::thread::sleep(std::time::Duration::from_millis(10));
+        let mut buf = BufReader::new(&s);
+        let mut data = [0u8; 32];
+        let len = buf.read(&mut data)?;
 
-                let mut buf = BufReader::new(stream);
-                let mut data = Vec::<u8>::new();
-                buf.read_to_end(&mut data).unwrap();
-                let msg: SocketMessage = match bincode::deserialize(&data) {
-                    Ok(m) => m,
-                    Err(e) => {
-                        eprintln!("{}", e);
-                        continue;
-                    }
-                };
+        let msg: SocketMessage = match bincode::deserialize(&data[0..len]) {
+            Ok(m) => m,
+            Err(e) => {
+                eprintln!("{}", e);
+                continue;
+            }
+        };
 
-                match msg.action {
+        match msg {
 
-                    SocketAction::RefreshMonitors => {
-                        println!("=> Rescanning...");
-                        let mut monitors = m.lock().unwrap();
-                        *monitors = Monitor::get_all();
-                    }
+            SocketMessage::RefreshMonitors => {
 
-                };
+                println!("=> Scanning for monitors...");
+
+                let monitors = padlock::mutex_lock(&m, |lock| {
+                    *lock = Monitor::get_all();
+                    lock.clone()
+                });
+
+                let data = bincode::serialize(&SocketMessage::Ok(monitors)).unwrap();
+                s.write(&data[..])?;
 
             },
-            Err(e) => {
 
-                eprintln!("Socket error: {}", e);
+            _ => eprintln!("Received invalid data")
 
-            }
-
-        }
+        };
 
     }
+
+    Ok(())
 
 }

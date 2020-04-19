@@ -5,6 +5,5 @@ mod socket;
 pub use socket::{
     socket as socket,
     SOCKET_ADDR,
-    SocketAction,
     SocketMessage
 };

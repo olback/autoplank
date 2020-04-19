@@ -21,7 +21,7 @@ fn main() {
     let matches = clap::App::from(yml).version(crate_version!()).get_matches();
 
     if matches.is_present("rescan") {
-        actions::rescan();
+        drop(actions::rescan());
     } else if matches.is_present("elementary-fix") {
         actions::elementary::fix()
     } else if matches.is_present("elementary-restore") {
@@ -59,7 +59,7 @@ fn main() {
     // Socket thread
     let socket_monitors = Arc::clone(&monitors);
     thread_handlers.push(std::thread::spawn(move || {
-        threads::socket(socket_monitors);
+        drop(threads::socket(socket_monitors));
     }));
 
     for th in thread_handlers {

@@ -23,7 +23,7 @@ impl Plank {
 
         if current.to_string().trim() != new {
 
-            println!("=> Switching to {}", new);
+            println!("=> Switching to {}", mon);
 
             let output = Command::new("dconf").args(&["write", DCONF_KEY, &new]).output().unwrap();
             let status = output.status.success();
@@ -62,7 +62,7 @@ impl Plank {
         let mut system = sysinfo::System::new();
         system.refresh_all();
 
-        for (pid, process) in system.get_process_list() {
+        for (pid, process) in system.get_processes() {
             if process.name() == "plank" {
                 return Some(*pid)
             }

@@ -1,20 +1,21 @@
 use std::process::Command;
 use super::mouse_location::MouseLocation;
 use regex::Regex;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Offset {
     pub x: u32,
     pub y: u32
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Resolution {
     pub width: u32,
     pub height: u32
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Monitor {
     pub name: String,
     pub resolution: Resolution,
@@ -88,7 +89,7 @@ impl Monitor {
 
     pub fn mouse_here(&self, mouse_location: &MouseLocation) -> bool {
 
-        return mouse_location.x >= self.offset.x && mouse_location.x < self.offset.x + &self.resolution.width
+        mouse_location.x >= self.offset.x && mouse_location.x < self.offset.x + &self.resolution.width
 
     }
 
