@@ -13,4 +13,4 @@ clap = { version = "2", features = ["yaml"] }
 regex = "1.3"
 sysinfo = "0.14"
 nix = "0.17"
-padlock = "0.1.1-alpha"
+padlock = "0.2.0"
