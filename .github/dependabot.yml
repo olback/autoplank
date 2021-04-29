@@ -1,0 +1,36 @@
+version: 2
+updates:
+- package-ecosystem: cargo
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: sysinfo
+    versions:
+    - 0.15.9
+    - 0.16.0
+    - 0.16.1
+    - 0.16.2
+    - 0.16.5
+    - 0.17.0
+    - 0.17.1
+  - dependency-name: regex
+    versions:
+    - 1.4.3
+    - 1.4.4
+    - 1.4.5
+  - dependency-name: serde
+    versions:
+    - 1.0.123
+    - 1.0.124
+  - dependency-name: bincode
+    versions:
+    - 1.3.2
+  - dependency-name: nix
+    versions:
+    - 0.19.1
+  - dependency-name: clap
+    versions:
+    - 2.33.3
